@@ -28,8 +28,9 @@ const THEMATIC_BREAK = /^[ \t]*([-*_])(?:[ \t]*\1){2,}[ \t]*$/u;
 const CODE_FENCE = /^([ \t]*(?:(?:[-*+]|\d{1,9}[.)])[ \t]+)?)(`{3,}|~{3,})(.*)$/u;
 
 /*
- * Shift only the ordered siblings that form the sequence directly below the inserted item. A gap,
- * another delimiter or another indent can be deliberate Markdown, so it ends the automatic edit.
+ * Shift only the ordered siblings that form the sequence directly below the inserted item. Blank
+ * lines, continuation lines and nested items stay inside the list. A gap, another delimiter, less
+ * indent or other text at the same indent can be deliberate Markdown, so it ends the automatic edit.
  */
 function renumberFollowingItems(
   text: string,
@@ -45,6 +46,10 @@ function renumberFollowingItems(
   for (let index = 1; index < lines.length; index += 1) {
     const line = lines[index];
     if (line === undefined) break;
+    if (!line.trim() || line.length - line.trimStart().length > indent.length) {
+      lineStart += line.length + 1;
+      continue;
+    }
     const item = LIST_ITEM.exec(line);
     const [, itemIndent = "", bullet, itemNumber, itemDelimiter] = item ?? [];
     if (

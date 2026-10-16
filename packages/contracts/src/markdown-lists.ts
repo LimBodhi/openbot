@@ -93,7 +93,7 @@ export function markdownListLineBreak(text: string, caret: number): MarkdownList
   return {
     text: renumbered.text.slice(0, caret) + insert + renumbered.text.slice(caret),
     caret: caret + insert.length,
-    replacements: renumbered.replacements.length > 0 ? renumbered.replacements : undefined,
+    ...(renumbered.replacements.length > 0 ? { replacements: renumbered.replacements } : {}),
   };
 }
 
